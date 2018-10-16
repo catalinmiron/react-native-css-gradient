@@ -6,19 +6,19 @@ Supported backgrounds:
 - [repeating-linear-gradient](https://developer.mozilla.org/en-US/docs/Web/CSS/repeating-linear-gradient)
 
 
-![image](./screenshots/gif.gif)
+![image](https://github.com/catalinmiron/react-native-css-gradient/raw/master/screenshots/gif.gif)
 <br/>
-<img src="./screenshots/grad1.png" width="400">
+<img src="https://github.com/catalinmiron/react-native-css-gradient/raw/master/screenshots/grad1.png" width="400">
 <br/>
-<img src="./screenshots/grad2.png" width="400">
+<img src="https://github.com/catalinmiron/react-native-css-gradient/raw/master/screenshots/grad2.png" width="400">
 <br/>
-<img src="./screenshots/grad3.png" width="400">
+<img src="https://github.com/catalinmiron/react-native-css-gradient/raw/master/screenshots/grad3.png" width="400">
 <br/>
-<img src="./screenshots/grad4.png" width="400">
+<img src="https://github.com/catalinmiron/react-native-css-gradient/raw/master/screenshots/grad4.png" width="400">
 <br/>
-<img src="./screenshots/grad5.png" width="400">
+<img src="https://github.com/catalinmiron/react-native-css-gradient/raw/master/screenshots/grad5.png" width="400">
 <br/>
-<img src="./screenshots/grad6.png" width="400">
+<img src="https://github.com/catalinmiron/react-native-css-gradient/raw/master/screenshots/grad6.png" width="400">
 
 
 ### Usage
@@ -33,7 +33,9 @@ render() {
 }
 ```
 
-This library will first try to import `LinearGradient` from [Expo](https://expo.io) or fallback to [react-native-linear-gradient](https://github.com/react-native-community/react-native-linear-gradient).
+This library is working only with `LinearGradient` from [Expo](https://expo.io).
+
+TODO: Add fallback to `react-native-linear-gradient` package in case when Expo is missing.
 
 ### Props
 
