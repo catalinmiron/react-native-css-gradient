@@ -1,6 +1,6 @@
 # CSS Gradient for LinearGradient
 
-CSS background image for React-Native.
+CSS background image for React-Native using `LinearGradient` from [Expo](https://expo.io).
 Supported backgrounds:
 - [linear-gradient](https://developer.mozilla.org/en-US/docs/Web/CSS/linear-gradient)
 - [repeating-linear-gradient](https://developer.mozilla.org/en-US/docs/Web/CSS/repeating-linear-gradient)
@@ -32,8 +32,6 @@ render() {
     return <Gradient gradient={gradient} style={yourStyle}>
 }
 ```
-
-This library is working only with `LinearGradient` from [Expo](https://expo.io).
 
 TODO: Add fallback to `react-native-linear-gradient` package in case when Expo is missing.
 
