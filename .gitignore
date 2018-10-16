@@ -178,8 +178,7 @@ Carthage/Build
 # https://github.com/johnno1962/injectionforxcode
 
 dist
-package-lock.json
-*/node_modules
+node_modules
 .idea
 .vscode
 .env*
