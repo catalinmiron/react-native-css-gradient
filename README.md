@@ -46,4 +46,4 @@ TODO: Add fallback to `react-native-linear-gradient` package in case when Expo i
 
 ### About
 
-If you have questions please don't hesistate to contact me on [Twitter](http://twitter.com/mironcatalin).
+If you have questions please don't hesitate to contact me on [Twitter](http://twitter.com/mironcatalin).
