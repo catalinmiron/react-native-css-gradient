@@ -1,6 +1,6 @@
 {
   "name": "react-native-css-gradient",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "CSS Gradient for LinearGradient component.",
   "author": "Catalin Miron",
   "license": "MIT",
@@ -17,8 +17,8 @@
     "gradient-parser": "0.1.5"
   },
   "peerDependencies": {
+    "expo": "*",
     "react": "*",
-    "react-native": "*",
-    "expo": "*"
+    "react-native": "*"
   }
 }
