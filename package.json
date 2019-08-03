@@ -18,6 +18,7 @@
   },
   "peerDependencies": {
     "expo": "*",
+    "expo-linear-gradient": "*",
     "react": "*",
     "react-native": "*"
   }
