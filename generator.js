@@ -2,6 +2,7 @@
   TODO: write tests (lazy) like always right? <3
 */
 const parser = require("gradient-parser");
+const memoize = require("fast-memoize");
 
 const getColor = color => {
   switch (color.type) {
@@ -14,27 +15,23 @@ const getColor = color => {
   }
 };
 
-const getColorsAndLocations = (colorStops, maxWidth) =>
+const getColorsAndLocations = memoize((colorStops, maxWidth) =>
   colorStops.reduce(
     (acc, color, index) => {
       acc.colors = [...acc.colors, getColor(color)];
 
       // PX value for location will break!
       // TODO Make it happen for px + repeat?
-      const locationValue = getPixelsForColor(
-        color,
-        colorStops.length,
-        index,
-        maxWidth
-      );
+      const locationValue = getPixelsForColor(color, colorStops.length, index, maxWidth);
       acc["locations"] = [...acc.locations, locationValue];
 
       return acc;
     },
     { colors: [], locations: [] }
-  );
+  )
+);
 
-const getPixelsForColor = (color, colorsLength, index, maxWidth) => {
+const getPixelsForColor = memoize((color, colorsLength, index, maxWidth) => {
   const { length } = color;
   if (!length) {
     return (1 / (colorsLength - 1)) * index;
@@ -49,33 +46,30 @@ const getPixelsForColor = (color, colorsLength, index, maxWidth) => {
       return length.value / 100;
     }
   }
-};
+});
+
 const getRepeatingColorsAndLocations = (colorStops, sizes) => {
   const { width: maxWidth, height: maxHeight } = sizes;
-
-  if (!maxWidth && !maxHeight) {
-    throw new Error(
-      "You have to define width and height for repeating gradient to work"
-    );
-  }
-
-  const {
-    colors: initialColors,
-    locations: initialLocations
-  } = getColorsAndLocations(colorStops, maxWidth);
+  const { colors: initialColors, locations: initialLocations } = getColorsAndLocations(colorStops, maxWidth);
   const maxValue = parseFloat(initialLocations.slice(-1)[0]);
   const increment = maxValue / maxWidth;
-  const maxChunks = Math.round(maxWidth / maxValue) + 1;
+  // we need to add +1 but this is breaking LinearGradient, maybe can't render
+  // it outside the viewport.
+  const maxChunks = Math.round(maxWidth / maxValue);
   const locations = [...Array(maxChunks).keys()].reduce((acc, i) => {
-    return [...acc, ...initialLocations.map(j => j / maxWidth + increment * i)];
+    return [
+      ...acc,
+      ...initialLocations.map(j => {
+        return j / maxWidth + increment * i;
+      })
+    ];
   }, []);
-  const colors = locations.map(
-    (_, i) => initialColors[i % initialColors.length]
-  );
+  const colors = locations.map((_, i) => initialColors[i % initialColors.length]);
 
-  return { locations, colors };
+  return { colors, locations };
 };
-const getVectorsByDirection = direction => {
+
+const getVectorsByDirection = memoize(direction => {
   switch (direction) {
     case "top":
       return getVectorsByAngle(0);
@@ -94,27 +88,31 @@ const getVectorsByDirection = direction => {
     case "right bottom":
       return getVectorsByAngle(90 + 45);
   }
-};
-const round = number => Math.round(number * 1000) / 1000;
-const degreesToRadians = function(degrees) {
-  return (degrees * Math.PI) / 180;
-};
-const getVectorsByAngle = alfa => {
+});
+
+const round = memoize(number => Math.round(number * 10000) / 10000);
+const degreesToRadians = memoize(degrees => (degrees * Math.PI) / 180);
+
+const getVectorsByAngle = memoize(alfa => {
   const angle = degreesToRadians(alfa);
 
-  let gradientLineLength = round(
-    Math.abs(Math.sin(angle)) + Math.abs(Math.cos(angle))
-  );
+  let gradientLineLength = round(Math.abs(Math.sin(angle)) + Math.abs(Math.cos(angle)));
   let center = { x: 0.5, y: 0.5 };
 
   let yDiff = (Math.sin(angle - Math.PI / 2) * gradientLineLength) / 2;
   let xDiff = (Math.cos(angle - Math.PI / 2) * gradientLineLength) / 2;
 
   return {
-    start: [center.x - xDiff, center.y - yDiff],
-    end: [center.x + xDiff, center.y + yDiff]
+    start: {
+      x: center.x - xDiff,
+      y: center.y - yDiff
+    },
+    end: {
+      x: center.x + xDiff,
+      y: center.y + yDiff
+    }
   };
-};
+});
 
 const getVectorsByOrientation = orientation => {
   return orientation.type === "directional"
@@ -122,7 +120,7 @@ const getVectorsByOrientation = orientation => {
     : getVectorsByAngle(orientation.value);
 };
 
-const generateGradient = (gradient, sizes) => {
+const generateGradient = memoize((gradient, sizes) => {
   return parser.parse(gradient).map(({ type, colorStops, orientation }) => {
     // YOLO: Radial gradients <3
     if (type === "radial-gradient") {
@@ -138,6 +136,6 @@ const generateGradient = (gradient, sizes) => {
       ...getVectorsByOrientation(orientation)
     };
   });
-};
+});
 
 export default generateGradient;
