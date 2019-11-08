@@ -1,16 +1,16 @@
 /*
   TODO: write tests (lazy) like always right? <3
 */
-const parser = require("gradient-parser");
+const parser = require('gradient-parser');
 
 const getColor = color => {
   switch (color.type) {
-    case "hex":
+    case 'hex':
       return `#${color.value}`;
-    case "literal":
+    case 'literal':
       return color.value;
     default:
-      return `${color.type}(${color.value.join(",")})`;
+      return `${color.type}(${color.value.join(',')})`;
   }
 };
 
@@ -21,12 +21,7 @@ const getColorsAndLocations = (colorStops, maxWidth) =>
 
       // PX value for location will break!
       // TODO Make it happen for px + repeat?
-      const locationValue = getPixelsForColor(
-        color,
-        colorStops.length,
-        index,
-        maxWidth
-      );
+      const locationValue = getPixelsForColor(color, colorStops.length, index, maxWidth);
       acc["locations"] = [...acc.locations, locationValue];
 
       return acc;
@@ -37,87 +32,92 @@ const getColorsAndLocations = (colorStops, maxWidth) =>
 const getPixelsForColor = (color, colorsLength, index, maxWidth) => {
   const { length } = color;
   if (!length) {
-    return (1 / (colorsLength - 1)) * index;
+      return (1 / (colorsLength - 1)) * index;
   }
   if (length.type === "px") {
-    return parseFloat(length.value);
+      return parseFloat(length.value);
   }
-  if (length.type === "%") {
-    if (maxWidth) {
-      return (parseFloat(length.value) * maxWidth) / 100;
-    } else {
-      return length.value / 100;
-    }
+  if (length.type === "%"){
+      if (maxWidth) {
+        return parseFloat(length.value) * maxWidth / 100;
+      } else {
+        return length.value / 100; 
+      }
   }
-};
+}
+
 const getRepeatingColorsAndLocations = (colorStops, sizes) => {
-  const { width: maxWidth, height: maxHeight } = sizes;
-
-  if (!maxWidth && !maxHeight) {
-    throw new Error(
-      "You have to define width and height for repeating gradient to work"
-    );
-  }
-
-  const {
-    colors: initialColors,
-    locations: initialLocations
-  } = getColorsAndLocations(colorStops, maxWidth);
+  const {width: maxWidth, height: maxHeight} = sizes;
+  const {colors: initialColors, locations: initialLocations} = getColorsAndLocations(colorStops, maxWidth);
   const maxValue = parseFloat(initialLocations.slice(-1)[0]);
   const increment = maxValue / maxWidth;
-  const maxChunks = Math.round(maxWidth / maxValue) + 1;
+  const maxChunks = Math.round((maxWidth / maxValue));  
   const locations = [...Array(maxChunks).keys()].reduce((acc, i) => {
-    return [...acc, ...initialLocations.map(j => j / maxWidth + increment * i)];
+    return [...acc, ...initialLocations.map(j => {
+      console.log()
+      return j/maxWidth + increment * i
+    })]
   }, []);
-  const colors = locations.map(
-    (_, i) => initialColors[i % initialColors.length]
-  );
+  const colors = locations.map((_, i) => initialColors[i % initialColors.length])
 
-  return { locations, colors };
+  return { colors, locations };
 };
+
 const getVectorsByDirection = direction => {
   switch (direction) {
-    case "top":
+    case 'top':
       return getVectorsByAngle(0);
-    case "right":
+    case 'right':
       return getVectorsByAngle(90);
-    case "bottom":
+    case 'bottom':
       return getVectorsByAngle(180);
-    case "left":
+    case 'left':
       return getVectorsByAngle(270);
-    case "left top":
+    case 'left top':
       return getVectorsByAngle(270 + 45);
-    case "left bottom":
+    case 'left bottom':
       return getVectorsByAngle(180 + 45);
-    case "right top":
+    case 'right top':
       return getVectorsByAngle(45);
-    case "right bottom":
+    case 'right bottom':
       return getVectorsByAngle(90 + 45);
   }
 };
-const round = number => Math.round(number * 1000) / 1000;
-const degreesToRadians = function(degrees) {
-  return (degrees * Math.PI) / 180;
-};
-const getVectorsByAngle = alfa => {
-  const angle = degreesToRadians(alfa);
 
-  let gradientLineLength = round(
-    Math.abs(Math.sin(angle)) + Math.abs(Math.cos(angle))
-  );
+const round = (number) => Math.round(number * 10000) / 10000;
+var pointFromAngleAndDistance = function (origin, angle, distance) {
+    angle = degreesToRadians(angle);
+    return {
+        x: distance * Math.cos(angle) + origin.x,
+        y: distance * Math.sin(angle) + origin.y
+    };
+};
+var degreesToRadians = function (degrees) { return degrees * Math.PI / 180; };
+
+const getVectorsByAngle = alfa => {
+  const angle = alfa * Math.PI / 180;
+
+  let gradientLineLength =
+    round(Math.abs(Math.sin(angle)) + Math.abs(Math.cos(angle)));
   let center = { x: 0.5, y: 0.5 };
 
   let yDiff = (Math.sin(angle - Math.PI / 2) * gradientLineLength) / 2;
   let xDiff = (Math.cos(angle - Math.PI / 2) * gradientLineLength) / 2;
 
   return {
-    start: [center.x - xDiff, center.y - yDiff],
-    end: [center.x + xDiff, center.y + yDiff]
+    start: {
+      x: center.x - xDiff,
+      y: center.y - yDiff
+    },
+    end: {
+      x: center.x + xDiff,
+      y: center.y + yDiff,
+    },
   };
 };
 
 const getVectorsByOrientation = orientation => {
-  return orientation.type === "directional"
+  return orientation.type === 'directional'
     ? getVectorsByDirection(orientation.value)
     : getVectorsByAngle(orientation.value);
 };
@@ -128,10 +128,7 @@ const generateGradient = (gradient, sizes) => {
     if (type === "radial-gradient") {
       return "Only linear-gradient type is supported for now";
     }
-    const colorsAndLocations =
-      type === "linear-gradient"
-        ? getColorsAndLocations(colorStops)
-        : getRepeatingColorsAndLocations(colorStops, sizes);
+    const colorsAndLocations = type === "linear-gradient" ? getColorsAndLocations(colorStops) : getRepeatingColorsAndLocations(colorStops, sizes);
 
     return {
       ...colorsAndLocations,
