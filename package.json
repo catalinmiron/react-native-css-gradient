@@ -21,6 +21,17 @@
     "expo": "*",
     "expo-linear-gradient": "*",
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "react-native-linear-gradient": "*"
+  },
+  "devDependencies": {
+    "@types/react": "16.9.38",
+    "@types/react-native": "0.62.13",
+    "prettier": "2.0.5"
+  },
+  "prettier": {
+    "semi": true,
+    "trailingComma": "es5",
+    "singleQuote": false
   }
 }

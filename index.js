@@ -4,30 +4,36 @@ import generateGradient from "./generator";
 
 export { generateGradient };
 
-export default ({ gradient, children, style }) => {
-  // Avoid breaking this when people are not using expo :)
-  // find a better solution to expose either expo-linear-gradient or
-  // react-native-linear-gradient.
-  const { LinearGradient } = require("expo-linear-gradient");
-
+const createCssGradient = (GradientComponent) => ({
+  gradient,
+  children,
+  style,
+}) => {
   const generated = generateGradient(gradient, {
     width: style.width,
-    height: style.height
+    height: style.height,
   });
+
   if (generated.length > 1) {
     return (
       <View style={[style, { position: "relative" }]}>
         {generated.map((obj, i) => (
-          <LinearGradient style={[StyleSheet.absoluteFill]} {...obj} key={i} />
+          <GradientComponent
+            style={[StyleSheet.absoluteFill]}
+            {...obj}
+            key={i}
+          />
         ))}
-        {children || null}
+        {children}
       </View>
     );
   }
 
   return (
-    <LinearGradient style={style} {...generated[0]}>
-      {children || null}
-    </LinearGradient>
+    <GradientComponent style={style} {...generated[0]}>
+      {children}
+    </GradientComponent>
   );
 };
+
+export default createCssGradient;
